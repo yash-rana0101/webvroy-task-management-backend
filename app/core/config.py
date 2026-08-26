@@ -21,7 +21,16 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> list[str]:
-        return json.loads(self.CORS_ORIGINS)
+        val = self.CORS_ORIGINS.strip()
+        if not val or val == "*":
+            return ["*"]
+        try:
+            parsed = json.loads(val)
+            if isinstance(parsed, list):
+                return parsed
+        except Exception:
+            pass
+        return [item.strip() for item in val.split(",") if item.strip()]
 
 
 @lru_cache
